@@ -24,7 +24,7 @@ template = """<div class="base-unit clearfix"><h2 class="base-unit-title"><a hre
 def get_name(url, output):
     trimmed = re.sub(r'https?:\/\/', '', url)
     trimmed = trimmed.replace("/", "_")
-    return os.path.join(output, trimmed)
+    return os.path.join(output, "img", trimmed)
 
 def get_img(url, output, replace=False):
     #if the url is not an image, continue
