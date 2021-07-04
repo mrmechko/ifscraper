@@ -1,32 +1,36 @@
 #!/usr/bin/env python
 
-from requests_html import HTMLSession
-import urllib.request
 import json, sys, os, traceback, re, time
-
+import urllib.request
 import argparse
+from requests_html import HTMLSession
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", help="output directory for files")
 parser.add_argument("--url", help="image flip url")
 parser.add_argument("--num", help="number of memes to scrape (default=10)", default=10, type=int)
 args = parser.parse_args()
 
-template = """<div class="base-unit clearfix"><h2 class="base-unit-title"><a href={href}>{title}</a></h2><div class="base-img-wrap-wrap"><div class="base-img-wrap" style="{img_width_wrap}"><a class="base-img-link" href="{base_link}" style="padding-bottom:112.5%"><img class="base-img" src="{img}" alt="{alt}"></a></div></div><div class="base-info"><div class="base-author">by <a class="u-username" href="{usr_name_url}">{usr}</a></div><div class="base-view-count">{info}</div>"""
-# href
-# title
+# Our template has the following entries
+# href : link to the post
+# title : title of the post
 # img_width_wrap
-# img
-# alt
-# view_count
-# usr
-# upvotes
+# base_link : link to the post
+# img : link to the image
+# alt : alt text - usually including ocr'd text
+# user_name_url : url to the user profile
+# usr : username
+# info : meta info about the post, including upvote, view, and comment counts
+TEMPLATE = """<div class="base-unit clearfix"><h2 class="base-unit-title"><a href={href}>{title}</a></h2><div class="base-img-wrap-wrap"><div class="base-img-wrap" style="{img_width_wrap}"><a class="base-img-link" href="{base_link}" style="padding-bottom:112.5%"><img class="base-img" src="{img}" alt="{alt}"></a></div></div><div class="base-info"><div class="base-author">by <a class="u-username" href="{usr_name_url}">{usr}</a></div><div class="base-view-count">{info}</div>"""
 
 def get_name(url, output):
+    """Convert the url for an image to a filename"""
     trimmed = re.sub(r'https?:\/\/', '', url)
     trimmed = trimmed.replace("/", "_")
     return os.path.join(output, "img", trimmed)
 
 def get_img(url, output, replace=False):
+    """Get an image from a url and save in output. if replace is false, skip files that already exist"""
     #if the url is not an image, continue
     if url.split(".")[-1] not in ["jpg", "png", "gif"]:
         print("not an image:", url, file=sys.stderr)
@@ -43,6 +47,7 @@ def get_img(url, output, replace=False):
 
 
 def scrape(url, output, num, replace=False):
+    """Scrape all posts from a specific imgflip page."""
     img_dir = os.path.join(output, "img")
     if not os.path.isdir(output):
         os.mkdir(output)
@@ -55,7 +60,7 @@ def scrape(url, output, num, replace=False):
 
     while len(res) < num:
         page.html.render()
-        for r in page.html.search_all(template):
+        for r in page.html.search_all(TEMPLATE):
             image_url = "https:"+r["img"]
             image_name = get_name(image_url, output)
             get_img(image_url, image_name, replace=replace)
