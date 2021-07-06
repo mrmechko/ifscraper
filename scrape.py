@@ -85,11 +85,11 @@ def scrape(url, output, num, replace=False):
         os.mkdir(img_dir)
 
     session = HTMLSession()
-    page = session.get(url.split("/")[-1])
+    page = session.get(url)
     res = []
 
     pbar = tqdm.tqdm(total=num)
-    pbar.set_description(url)
+    pbar.set_description(url.split("/")[-1])
     while len(res) < num:
         page.html.render()
         # print(page.html)
@@ -116,13 +116,18 @@ def scrape(url, output, num, replace=False):
         json.dump(res, f, indent=2)
 
 def load_batch(f, num=100, batch_name="batch"):
+    prefix = "https://imgflip.com/memegenerator/"
     with open(f) as inp:
         data = json.load(inp)
+        start = False
         for d in data:
-            gen = d["generator"].split("/")[-1]
+            # gen = d["generator"].split("/")[-1]
+            # turns out some meme templates might have a number prefixed to them
+            # eg: https://imgflip.com/memegenerator/309868304/Trade-Offer
+            gen = d["generator"].replace(prefix, "")
             d["code"] = gen
             url = f"https://imgflip.com/meme/{gen}"
-            # print(f"scraping {url}")
+            print(f"scraping {url}")
             output = f"{batch_name}/{gen}"
             scrape(url, output, num)
     with open(f, "w") as outf:
