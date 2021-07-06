@@ -11,6 +11,11 @@ parser.add_argument("--url", help="image flip url")
 parser.add_argument("--num", help="number of memes to scrape (default=10)", default=10, type=int)
 args = parser.parse_args()
 
+# set headers for urllib
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+urllib.request.install_opener(opener)
+
 # Our template has the following entries
 # href : link to the post
 # title : title of the post
@@ -78,11 +83,6 @@ if __name__ == '__main__':
     url = args.url
     output = args.output
     num = int(args.num)
-
-    # set headers for urllib
-    opener = urllib.request.build_opener()
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    urllib.request.install_opener(opener)
 
 
     scrape(url, output, num)
