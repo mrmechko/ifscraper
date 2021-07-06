@@ -104,10 +104,13 @@ def scrape(url, output, num, replace=False):
                 meta = dict(img=image_name, url=image_url, alt=img_link.attrs["alt"], info=parse_info(r.find("div.base-view-count", first=True).text), user=r.find("a.u-username", first=True).text, title=r.find("h2 > a", first=True).text)
                 res.append(meta)
                 pbar.update(1)
-                # print(json.dumps(meta, indent=2))
             except:
                 print("failed to retrieve meme")
             time.sleep(2)
+            if len(res) == num:
+                break
+        if len(res) == num:
+            break
         next_url = page.html.next()
         pbar.set_description(next_url.split("/")[-1])
         page = session.get(next_url)
@@ -128,10 +131,25 @@ def load_batch(f, num=100, batch_name="batch"):
             d["code"] = gen
             url = f"https://imgflip.com/meme/{gen}"
             print(f"scraping {url}")
-            output = f"{batch_name}/{gen}"
+            # I don't know if the multi-segment codes are necessary
+            # It may be the case that some meme-templates have conflicting names
+            # just in case, I'll keep the prefix segment
+            gen_clean = gen.replace("/", "-")
+            output = f"{batch_name}/{gen_clean}"
             scrape(url, output, num)
     with open(f, "w") as outf:
         json.dump(data, outf, indent=2)
+
+def sample_list(f, num=2, batch_name="sample"):
+    with open(f) as inp:
+        for meme in inp.readlines():
+            meme = meme.strip()
+            url = f"https://imgflip.com/meme/{meme}"
+            scrape(url, batch_name, num)
+            for _ in tqdm.tqdm(range(15), desc="Sleeping"):
+                time.sleep(1)
+
+
 
 if __name__ == '__main__':
     url = args.url
