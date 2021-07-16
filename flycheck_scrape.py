@@ -76,25 +76,7 @@ def parse_info(info):
         res["comments"] = int(info[info.index("comments") - 1])
     return res
 
-def parse_alt(alt, has_title=True):
-    """This may be messy in the off chance that there is a | or ; in the title or text"""
-    alt = alt.replace("| made w/ Imgflip meme maker", "")
-    segment = alt.split("|")
-    title = None
-    if has_title:
-        title = segment[0]
-        segment = segment[1:]
-    tags = []
-    text = []
-    for e in segment:
-        e = e.strip()
-        if e.startswith("image tagged in "):
-            tags = e.replace("image tagged in ", "").split(",")
-        else:
-            text = e.split(";")
-    return dict(title=title, tags=tags, text=text)
-
-def scrape(url, output, num, replace=False, sid=None):
+def scrape(url, output, num, replace=False):
     """Scrape all posts from a specific imgflip page."""
     img_dir = os.path.join(output, "img")
     if not os.path.isdir(output):
@@ -108,11 +90,6 @@ def scrape(url, output, num, replace=False, sid=None):
 
     pbar = tqdm.tqdm(total=num)
     pbar.set_description(url.split("/")[-1])
-    fname = "scrape.json"
-    if sid != None:
-        fname = f"scrape_{sid}.json"
-    backup_file = os.path.join(output, f"{fname}.backup")
-
     while len(res) < num:
         page.html.render()
         # print(page.html)
@@ -120,44 +97,29 @@ def scrape(url, output, num, replace=False, sid=None):
             # print(r)
             try:
                 img_link = r.find("img.base-img", first=True)
-                if not img_link:
-                    continue
                 img = img_link.attrs["src"]
                 image_url = "https:"+img
                 image_name = get_name(image_url, output)
                 get_img(image_url, image_name, replace=replace)
-                # if there is a title, the first segment of alt-text is that title
-                has_title = r.find("h2 > a", first=True) != None
-                meta = dict(img=image_name,
-                            url=image_url,
-                            alt=parse_alt(img_link.attrs["alt"], has_title),
-                            info=parse_info(r.find("div.base-view-count", first=True).text),
-                            user=r.find("a.u-username", first=True).text)
+                meta = dict(img=image_name, url=image_url, alt=img_link.attrs["alt"], info=parse_info(r.find("div.base-view-count", first=True).text), user=r.find("a.u-username", first=True).text, title=r.find("h2 > a", first=True).text)
                 res.append(meta)
                 pbar.update(1)
-            except Exception:
-                print(traceback.format_exc())
+            except:
                 print("failed to retrieve meme")
             time.sleep(2)
             if len(res) == num:
                 break
-            elif len(res) % 10 == 0:
-                with open(backup_file, w) as f:
-                    json.dump(res, f, indent=2)
         if len(res) == num:
             break
         next_url = page.html.next()
         pbar.set_description(next_url.split("/")[-1])
         page = session.get(next_url)
 
-    with open(os.path.join(output, fname), "w") as f:
+    with open(os.path.join(output, "scrape.json"), "w") as f:
         json.dump(res, f, indent=2)
-    if os.path.exists(backup_file):
-        os.remove(backup_file)
 
 def load_batch(f, num=100, batch_name="batch"):
     prefix = "https://imgflip.com/memegenerator/"
-    k = 0
     with open(f) as inp:
         data = json.load(inp)
         start = False
@@ -174,8 +136,7 @@ def load_batch(f, num=100, batch_name="batch"):
             # just in case, I'll keep the prefix segment
             gen_clean = gen.replace("/", "-")
             output = f"{batch_name}/{gen_clean}"
-            scrape(url, output, num, sid=k)
-            k += 1
+            scrape(url, output, num)
     with open(f, "w") as outf:
         json.dump(data, outf, indent=2)
 
