@@ -81,6 +81,18 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "fire"
+version = "0.4.0"
+description = "A library for automatically generating command line interfaces."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = "*"
+termcolor = "*"
+
+[[package]]
 name = "idna"
 version = "2.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -197,6 +209,14 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "termcolor"
+version = "1.1.0"
+description = "ANSII Color formatting for output in terminal."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "tqdm"
 version = "4.61.2"
 description = "Fast, Extensible Progress Meter"
@@ -247,7 +267,7 @@ python-versions = ">=3.6.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "95b200cfbeefa7ec2693bdf357bb5ea412af7b9d20e84401da7b46ba655cdbc1"
+content-hash = "5366cbfa511fb7ff08e1588628b6aa4bdf3dd4f095ff7d46ed8cdc03708f9f6b"
 
 [metadata.files]
 appdirs = [
@@ -284,6 +304,9 @@ cssselect = [
 ]
 fake-useragent = [
     {file = "fake-useragent-0.1.11.tar.gz", hash = "sha256:c104998b750eb097eefc28ae28e92d66397598d2cf41a31aa45d5559ef1adf35"},
+]
+fire = [
+    {file = "fire-0.4.0.tar.gz", hash = "sha256:c5e2b8763699d1142393a46d0e3e790c5eb2f0706082df8f647878842c216a62"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -367,6 +390,9 @@ six = [
 soupsieve = [
     {file = "soupsieve-2.2.1-py3-none-any.whl", hash = "sha256:c2c1c2d44f158cdbddab7824a9af8c4f83c76b1e23e049479aa432feb6c4c23b"},
     {file = "soupsieve-2.2.1.tar.gz", hash = "sha256:052774848f448cf19c7e959adf5566904d525f33a3f8b6ba6f6f8f26ec7de0cc"},
+]
+termcolor = [
+    {file = "termcolor-1.1.0.tar.gz", hash = "sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"},
 ]
 tqdm = [
     {file = "tqdm-4.61.2-py2.py3-none-any.whl", hash = "sha256:5aa445ea0ad8b16d82b15ab342de6b195a722d75fc1ef9934a46bba6feafbc64"},

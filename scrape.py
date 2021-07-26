@@ -5,16 +5,7 @@ import urllib.request
 import argparse
 from requests_html import HTMLSession
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--output", help="output directory for files")
-parser.add_argument("--url", help="image flip url")
-parser.add_argument("--num", help="number of memes to scrape (default=10)", default=10, type=int)
-args = parser.parse_args()
 
-# set headers for urllib
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-urllib.request.install_opener(opener)
 
 # Our template has the following entries
 # href : link to the post
@@ -191,6 +182,17 @@ def sample_list(f, num=2, batch_name="sample"):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", help="output directory for files")
+    parser.add_argument("--url", help="image flip url")
+    parser.add_argument("--num", help="number of memes to scrape (default=10)", default=10, type=int)
+    args = parser.parse_args()
+
+    # set headers for urllib
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    urllib.request.install_opener(opener)
+
     url = args.url
     output = args.output
     num = int(args.num)
